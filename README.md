@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pitch Angle Generator
 
-## Getting Started
+A small tool for PR consultants: paste a client announcement, pick which
+journalist archetypes you're targeting, and get a distinct pitch angle —
+subject line, hook, and a proof point grounded in the announcement — for
+each one.
 
-First, run the development server:
+Built for the Pathos Communications take-home. Full spec: [`PRD.md`](./PRD.md).
+
+## Why this
+
+PR consultants often need to reframe the same announcement multiple ways —
+a funding round matters differently to a trade reporter than to a local news
+desk. Doing that by hand for every announcement is slow. This automates the
+first draft so a consultant can start from angles instead of a blank page.
+
+## Stack
+
+- Next.js (App Router) + TypeScript + Tailwind CSS v4
+- Anthropic API (Claude) for angle generation, called server-side
+- Vitest for unit tests
+
+## Running locally
+
+```bash
+npm install
+```
+
+Add your Anthropic API key to a `.env.local` file:
+
+```
+ANTHROPIC_API_KEY=your-key-here
+```
+
+Then:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tests
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm test
+```
 
-## Learn More
+## How this was built
 
-To learn more about Next.js, take a look at the following resources:
+Built with Claude Code, directing implementation in small, reviewable
+commits rather than one large generation — see commit history. The
+generation prompt explicitly instructs the model to ground each proof point
+in details actually present in the input announcement, rather than
+inventing specifics.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## What's out of scope (by design)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- No real journalist/media database or contact matching
+- No sending/outreach capability
+- No user accounts or persistence — session-only
 
-## Deploy on Vercel
+## What I'd do next
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Real journalist/outlet suggestions per archetype (not just angles)
+- Tone presets per client (e.g. formal vs. scrappy startup voice)
+- Save/export a set of angles as a one-pager
