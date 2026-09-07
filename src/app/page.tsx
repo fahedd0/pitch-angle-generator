@@ -9,6 +9,13 @@ const ARCHETYPES = [
   "Tech Press",
 ] as const;
 
+const ARCHETYPE_COLORS: Record<string, string> = {
+  "Trade Press": "#2451B3",
+  "Business/Finance Press": "#1C7C54",
+  "Local News": "#B3542B",
+  "Tech Press": "#6C4FC7",
+};
+
 type PitchResult = {
   archetype: string;
   subject_line: string;
@@ -69,62 +76,120 @@ export default function Home() {
   }
 
   return (
-    <main>
-      <h1>Pitch Angle Generator</h1>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="announcement">Client announcement</label>
-        <textarea
-          id="announcement"
-          value={announcement}
-          onChange={(e) => setAnnouncement(e.target.value)}
-          rows={6}
-          minLength={20}
-          maxLength={1000}
-          required
-        />
+    <div className="min-h-screen bg-[#FAFAF8]">
+      <main className="max-w-xl mx-auto px-6 py-16 md:py-24">
+        <header className="mb-12">
+          <h1 className="font-serif text-4xl md:text-[2.75rem] leading-[1.1] text-[#1B1B18]">
+            Pitch Angle Generator
+          </h1>
+          <p className="mt-3 text-[15px] text-[#6E6B63] max-w-sm">
+            Paste the news. Pick who needs to hear it. Get an angle worth a
+            journalist&apos;s time for each.
+          </p>
+        </header>
 
-        <fieldset>
-          <legend>Target archetypes</legend>
-          {ARCHETYPES.map((archetype) => (
-            <label key={archetype}>
-              <input
-                type="checkbox"
-                checked={selectedArchetypes.includes(archetype)}
-                onChange={() => toggleArchetype(archetype)}
-              />
-              {archetype}
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div>
+            <label
+              htmlFor="announcement"
+              className="block text-sm text-[#1B1B18] mb-2"
+            >
+              Client announcement
             </label>
-          ))}
-        </fieldset>
+            <textarea
+              id="announcement"
+              value={announcement}
+              onChange={(e) => setAnnouncement(e.target.value)}
+              rows={6}
+              minLength={20}
+              maxLength={1000}
+              required
+              placeholder="Client X closed a $5M Series A led by Y Capital to expand payment infrastructure across the GCC..."
+              className="w-full border border-[#E5E3DC] bg-white px-4 py-3 text-[15px] text-[#1B1B18] placeholder:text-[#A8A59C] focus:outline-none focus:border-[#2451B3] transition-colors"
+            />
+          </div>
 
-        <button type="submit">Generate pitch angles</button>
-      </form>
+          <div>
+            <p className="text-sm text-[#1B1B18] mb-3">Target archetypes</p>
+            <div className="flex flex-wrap gap-2">
+              {ARCHETYPES.map((archetype) => {
+                const selected = selectedArchetypes.includes(archetype);
+                return (
+                  <label
+                    key={archetype}
+                    className={`text-sm px-3 py-1.5 border cursor-pointer transition-colors ${
+                      selected
+                        ? "border-[#1B1B18] bg-[#1B1B18] text-white"
+                        : "border-[#E5E3DC] text-[#1B1B18] hover:border-[#1B1B18]"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selected}
+                      onChange={() => toggleArchetype(archetype)}
+                      className="hidden"
+                    />
+                    {archetype}
+                  </label>
+                );
+              })}
+            </div>
+          </div>
 
-      {loading && <p>Generating...</p>}
-      {error && <p role="alert">{error}</p>}
+          <button
+            type="submit"
+            disabled={loading}
+            className="bg-[#2451B3] text-white text-sm px-5 py-2.5 hover:bg-[#1D3F91] disabled:opacity-50 transition-colors"
+          >
+            {loading ? "Generating…" : "Generate pitch angles"}
+          </button>
+        </form>
 
-      {results.length > 0 && (
-        <section aria-label="Pitch angle results">
-          {results.map((result) => (
-            <article key={result.archetype}>
-              <h2>{result.archetype}</h2>
-              <p><strong>{result.subject_line}</strong></p>
-              <p>{result.hook}</p>
-              <p><em>{result.proof_point}</em></p>
-              <button
-                type="button"
-                onClick={() =>
-                  navigator.clipboard.writeText(
-                    `${result.subject_line}\n\n${result.hook}\n\n${result.proof_point}`
-                  )
-                }
+        {error && (
+          <p role="alert" className="mt-4 text-sm text-[#B3542B]">
+            {error}
+          </p>
+        )}
+
+        {results.length > 0 && (
+          <section aria-label="Pitch angle results" className="mt-16 space-y-8">
+            {results.map((result) => (
+              <article
+                key={result.archetype}
+                style={{
+                  borderLeftColor:
+                    ARCHETYPE_COLORS[result.archetype] ?? "#1B1B18",
+                }}
+                className="border-l-[3px] pl-5 py-1"
               >
-                Copy
-              </button>
-            </article>
-          ))}
-        </section>
-      )}
-    </main>
+                <p className="text-xs text-[#6E6B63] mb-1">
+                  {result.archetype}
+                </p>
+                <h2 className="font-serif text-lg text-[#1B1B18] mb-2">
+                  {result.subject_line}
+                </h2>
+                <p className="text-[15px] text-[#3B3A36] mb-2">
+                  {result.hook}
+                </p>
+                <p className="text-sm text-[#6E6B63] italic mb-3">
+                  {result.proof_point}
+                </p>
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigator.clipboard.writeText(
+                      `${result.subject_line}\n\n${result.hook}\n\n${result.proof_point}`
+                    )
+                  }
+                  className="text-xs text-[#2451B3] hover:underline"
+                >
+                  Copy
+                </button>
+              </article>
+            ))}
+          </section>
+        )}
+      </main>
+    </div>
   );
 }
