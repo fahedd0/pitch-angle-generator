@@ -36,8 +36,19 @@ export default function Home() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
     setError("");
+
+    if (announcement.trim().length < 20) {
+      setError("Announcement must be at least 20 characters.");
+      return;
+    }
+
+    if (selectedArchetypes.length === 0) {
+      setError("Select at least one archetype.");
+      return;
+    }
+
+    setLoading(true);
     setResults([]);
 
     try {
@@ -49,6 +60,7 @@ export default function Home() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Something went wrong");
       setResults(data.results);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.message);
     } finally {
