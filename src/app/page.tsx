@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { validatePitchInput } from "@/lib/validate";
 
 const ARCHETYPES = [
   "Trade Press",
@@ -45,13 +46,9 @@ export default function Home() {
     e.preventDefault();
     setError("");
 
-    if (announcement.trim().length < 20) {
-      setError("Announcement must be at least 20 characters.");
-      return;
-    }
-
-    if (selectedArchetypes.length === 0) {
-      setError("Select at least one archetype.");
+    const validation = validatePitchInput(announcement, selectedArchetypes);
+    if (!validation.valid) {
+      setError(validation.error);
       return;
     }
 
