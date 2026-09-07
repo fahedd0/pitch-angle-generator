@@ -10,6 +10,10 @@ const ARCHETYPES = [
 ] as const;
 
 export default function Home() {
+  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState<any[]>([]);
+  const [error, setError] = useState("");
+
   const [announcement, setAnnouncement] = useState("");
   const [selectedArchetypes, setSelectedArchetypes] = useState<string[]>([
     ...ARCHETYPES,
@@ -23,10 +27,27 @@ export default function Home() {
     );
   }
 
-  function handleSubmit(e: React.FormEvent) {
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    console.log({ announcement, selectedArchetypes });
-    // API call wired in Step 4
+    setLoading(true);
+    setError("");
+    setResults([]);
+
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ announcement, archetypes: selectedArchetypes }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Something went wrong");
+      setResults(data.results);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -60,6 +81,8 @@ export default function Home() {
 
         <button type="submit">Generate pitch angles</button>
       </form>
+      {loading && <p>Generating...</p>}
+      {error && <p>{error}</p>}
     </main>
   );
 }
