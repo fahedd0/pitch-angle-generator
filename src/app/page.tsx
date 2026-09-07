@@ -9,9 +9,16 @@ const ARCHETYPES = [
   "Tech Press",
 ] as const;
 
+type PitchResult = {
+  archetype: string;
+  subject_line: string;
+  hook: string;
+  proof_point: string;
+};
+
 export default function Home() {
   const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<PitchResult[]>([]);
   const [error, setError] = useState("");
 
   const [announcement, setAnnouncement] = useState("");
@@ -26,7 +33,6 @@ export default function Home() {
         : [...prev, archetype]
     );
   }
-
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -81,8 +87,32 @@ export default function Home() {
 
         <button type="submit">Generate pitch angles</button>
       </form>
+
       {loading && <p>Generating...</p>}
-      {error && <p>{error}</p>}
+      {error && <p role="alert">{error}</p>}
+
+      {results.length > 0 && (
+        <section aria-label="Pitch angle results">
+          {results.map((result) => (
+            <article key={result.archetype}>
+              <h2>{result.archetype}</h2>
+              <p><strong>{result.subject_line}</strong></p>
+              <p>{result.hook}</p>
+              <p><em>{result.proof_point}</em></p>
+              <button
+                type="button"
+                onClick={() =>
+                  navigator.clipboard.writeText(
+                    `${result.subject_line}\n\n${result.hook}\n\n${result.proof_point}`
+                  )
+                }
+              >
+                Copy
+              </button>
+            </article>
+          ))}
+        </section>
+      )}
     </main>
   );
 }
